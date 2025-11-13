@@ -1,0 +1,29 @@
+<MainScreen>:
+    orientation: "vertical"
+    padding: 20
+    spacing: 10
+    canvas.before:
+        Color:
+            rgba: 0.1, 0.1, 0.1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    Label:
+        text: "Nifty Intraday Trading Bot"
+        color: 1, 1, 1, 1
+        font_size: "22sp"
+        bold: True
+        size_hint_y: 0.2
+
+    Label:
+        id: signal_label
+        text: "📊 Signal Loading..."
+        color: 0, 1, 0, 1
+        font_size: "20sp"
+        size_hint_y: 0.6
+
+    Button:
+        text: "Exit App"
+        size_hint_y: 0.2
+        on_release: app.stop()
