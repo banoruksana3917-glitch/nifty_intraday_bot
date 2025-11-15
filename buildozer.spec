@@ -11,7 +11,3 @@ requirements = python3,kivy
 log_level = 2
 
 [android]
-api = 33
-minapi = 21
-android.sdk_path = /home/runner/.buildozer/android/platform/android-sdk
-android.ndk_path = /home/runner/.buildozer/android/platform/android-ndk
