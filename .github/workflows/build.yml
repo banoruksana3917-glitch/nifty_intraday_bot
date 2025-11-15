@@ -26,39 +26,33 @@ jobs:
         pip install --upgrade pip
         pip install buildozer cython
 
-    - name: Download and Setup Android SDK
+    - name: Create EXACT SDK Structure for Buildozer
       run: |
-        # Create directory structure that buildozer expects
-        mkdir -p ~/.buildozer/android/platform/android-sdk
-        cd ~/.buildozer/android/platform/android-sdk
+        # Buildozer jo path expect kar raha hai wahi banate hain
+        mkdir -p /home/runner/.buildozer/android/platform/android-sdk/tools/bin
+        cd /home/runner/.buildozer/android/platform/android-sdk
         
-        # Download command line tools
+        # Download tools in EXACT location
         wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
         unzip -q commandlinetools-linux-9477386_latest.zip
-        mv cmdline-tools latest
+        mv cmdline-tools tools
         
-        # Set environment variables
-        echo "ANDROID_HOME=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
-        echo "ANDROID_SDK_ROOT=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
-        echo "PATH=$PATH:$HOME/.buildozer/android/platform/android-sdk/latest/bin" >> $GITHUB_ENV
-
-    - name: Wait for PATH to update
-      run: |
-        sleep 5
+        echo "ANDROID_HOME=/home/runner/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
+        echo "ANDROID_SDK_ROOT=/home/runner/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
 
     - name: Accept SDK Licenses
       run: |
-        cd ~/.buildozer/android/platform/android-sdk/latest/bin
-        yes | ./sdkmanager --sdk_root=../../.. --licenses
+        cd /home/runner/.buildozer/android/platform/android-sdk/tools/bin
+        yes | ./sdkmanager --sdk_root=../.. --licenses
 
     - name: Install Android Packages
       run: |
-        cd ~/.buildozer/android/platform/android-sdk/latest/bin
-        ./sdkmanager --sdk_root=../../.. "platform-tools" "platforms;android-33" "build-tools;33.0.2"
+        cd /home/runner/.buildozer/android/platform/android-sdk/tools/bin
+        ./sdkmanager --sdk_root=../.. "platform-tools" "platforms;android-33" "build-tools;33.0.2" "emulator"
 
     - name: Build APK
       run: |
-        buildozer android debug
+        buildozer -v android debug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
