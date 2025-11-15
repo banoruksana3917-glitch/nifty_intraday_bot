@@ -19,39 +19,42 @@ jobs:
     - name: Install System Dependencies
       run: |
         sudo apt update
-        sudo apt install -y zip unzip openjdk-17-jdk python3-pip libffi-dev libssl-dev autoconf automake libtool
+        sudo apt install -y zip unzip openjdk-17-jdk python3-pip libffi-dev libssl-dev autoconf automake libtool wget
 
     - name: Install Buildozer & Cython
       run: |
         pip install --upgrade pip
         pip install buildozer cython
 
-    - name: Pre-create buildozer directories
+    - name: Download and Setup Android SDK
       run: |
-        mkdir -p /home/runner/.buildozer/android/platform/android-sdk/build-tools
-        mkdir -p /home/runner/.buildozer/android/platform/android-sdk/cmdline-tools
-
-    - name: Setup Android SDK (Buildozer Compatible)
-      run: |
-        mkdir -p /home/runner/.buildozer/android/platform/android-sdk
-        cd /home/runner/.buildozer/android/platform/android-sdk
+        # Create directory structure that buildozer expects
+        mkdir -p ~/.buildozer/android/platform/android-sdk
+        cd ~/.buildozer/android/platform/android-sdk
+        
+        # Download command line tools
         wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
         unzip -q commandlinetools-linux-9477386_latest.zip
         mv cmdline-tools latest
-        echo "ANDROID_SDK_ROOT=/home/runner/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
-        echo "PATH=$PATH:/home/runner/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_ENV
+        
+        # Set environment variables
+        echo "ANDROID_HOME=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
+        echo "ANDROID_SDK_ROOT=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
+        echo "PATH=$PATH:$HOME/.buildozer/android/platform/android-sdk/latest/bin" >> $GITHUB_ENV
 
-    - name: Accept Licenses
+    - name: Wait for PATH to update
       run: |
-        yes | sdkmanager --sdk_root=/home/runner/.buildozer/android/platform/android-sdk --licenses
+        sleep 5
 
-    - name: Install SDK Packages
+    - name: Accept SDK Licenses
       run: |
-        sdkmanager --sdk_root=/home/runner/.buildozer/android/platform/android-sdk \
-          "platform-tools" \
-          "platforms;android-33" \
-          "build-tools;33.0.2" \
-          "ndk;25.1.8937393"
+        cd ~/.buildozer/android/platform/android-sdk/latest/bin
+        yes | ./sdkmanager --sdk_root=../../.. --licenses
+
+    - name: Install Android Packages
+      run: |
+        cd ~/.buildozer/android/platform/android-sdk/latest/bin
+        ./sdkmanager --sdk_root=../../.. "platform-tools" "platforms;android-33" "build-tools;33.0.2"
 
     - name: Build APK
       run: |

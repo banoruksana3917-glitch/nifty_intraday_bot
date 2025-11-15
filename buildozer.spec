@@ -14,5 +14,3 @@ log_level = 2
 api = 33
 minapi = 21
 android.sdk_path = /home/runner/.buildozer/android/platform/android-sdk
-android.build_tools_version = 33.0.2
-android.allow_backup = False
